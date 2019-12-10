@@ -1,21 +1,28 @@
 <template>
   <q-page class="flex flex-center">
-    <div v-if="buscandoPontos">
-      <h5>Buscando pontos próximos a sua localização...</h5>
-    </div>
-    <div v-if="textoParada">
-      Parada: {{ textoParada }}
-    </div>
-    <ul>
-      <li v-bind:key="previsao.sgLin" v-for="previsao in previsoes">
-        {{ previsao.sgLin }} - {{ previsao.apelidoLinha}}
-        {{ previsao.prev }}
-      </li>
-    </ul>
-    <div class="row">
-      <div id="mapid" style="width: 49vh; height: 60vh;"></div>
+    <!-- SOMENTE É EXIBIDO QUANDO O ESTADO É IGUAL A INICIO  -->
+    <div id="mapid" style="width: 49vh; height: 60vh;"></div>
+    <div class="row" v-if="estadoDaAplicacao === 'mapa'">
+
     </div>
 
+    <!-- SOMENTE É EXIBIDO QUANDO O ESTADO DA APLICAÇÃO É BUSCANDO -->
+    <div v-if="estadoDaAplicacao === 'buscando'">
+      <h5>Buscando pontos próximos a sua localização...</h5>
+    </div>
+
+    <div v-if="estadoDaAplicacao === 'selecionado'">
+      <div v-if="textoParada">
+        Parada: {{ textoParada }}
+      </div>
+      <ul>
+        Status da previsão: {{ mensagemPrevisao }}
+        <li v-bind:key="previsao.sgLin" v-for="previsao in previsoes">
+          {{ previsao.sgLin }} - {{ previsao.apelidoLinha}}
+          {{ previsao.prev }}
+        </li>
+      </ul>
+    </div>
   </q-page>
 </template>
 
@@ -26,16 +33,17 @@ export default {
   name: 'PageIndex',
   data () {
     return {
+      estadoDaAplicacao: 'mapa',
       location: null,
       gettingLocation: false,
       errorStr: null,
-      buscandoPontos: false,
       objetoParada: {},
       paradas: [],
       previsoes: [],
       lib: null,
       mapa: null,
-      textoParada: ''
+      textoParada: '',
+      mensagemPrevisao: 'buscando...'
     }
   },
   created () {
@@ -78,14 +86,13 @@ export default {
       const self = this
       const lat = self.location.coords.latitude
       const lon = this.location.coords.longitude
-      self.buscandoPontos = true
-      axios.post('https://wd89y2nqbe.execute-api.us-east-2.amazonaws.com/prod/pontos/proximos', {
-        lat: lat.toString(),
-        lon: lon.toString()
-      })
+
+      self.estadoDaAplicacao = 'buscando'
+
+      axios.get('https://bhonibus.brian.place/pontos/proximos/' + lat + '/' + lon)
         .then(function (response) {
           console.log(response)
-          self.buscandoPontos = false
+          self.estadoDaAplicacao = 'mapa'
           if (response.data.errorMessage) {
             self.buscarPontos()
           } else {
@@ -95,7 +102,7 @@ export default {
         })
         .catch(function (error) {
           console.log(error)
-          self.buscandoPontos = false
+          self.estadoDaAplicacao = 'mapa'
         })
         .finally(function () {
           // always executed
@@ -115,12 +122,14 @@ export default {
       const self = this
       const concat = e.latlng.lng + '#' + e.latlng.lat
       self.textoParada = self.objetoParada[concat].desc
+      self.estadoDaAplicacao = 'selecionado'
 
       axios.post('https://wd89y2nqbe.execute-api.us-east-2.amazonaws.com/prod/pontos/previsao', {
-        codPonto: self.objetoParada[concat].cod
+        codPonto: self.objetoParada[concat].cod.toString()
       })
         .then(function (response) {
-          self.previsoes = response.previsoes
+          self.previsoes = response.data.previsoes
+          self.mensagemPrevisao = response.data.mensagem
         })
         .catch(function (error) {
           console.log(error)
