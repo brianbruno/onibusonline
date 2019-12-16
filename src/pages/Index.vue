@@ -16,7 +16,7 @@
 
         <q-card-section>
           <q-btn
-            fab
+            round
             color="dark"
             icon="star"
             class="absolute"
@@ -24,7 +24,7 @@
           />
           <div class="row items-center">
             <div class="col text-h6 ellipsis">{{ paradaInfo.nome }}</div>
-            <div class="text-grey q-pt-md">
+            <div class="distanciaCss text-grey q-pt-md">
               <q-icon name="place" /> {{ paradaInfo.distancia }} m
             </div>
           </div>
@@ -56,6 +56,14 @@
     </q-dialog>
   </q-page>
 </template>
+
+<style scoped>
+  .distanciaCss {
+    position: absolute;
+    right: 225px;
+    height: 2px;
+  }
+  </style>
 
 <script>
 import axios from 'axios'

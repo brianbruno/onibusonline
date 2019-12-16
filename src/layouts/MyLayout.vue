@@ -1,7 +1,7 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
-      <q-toolbar>
+      <q-toolbar class=" bg-grey text-black">
         <q-btn
           flat
           dense
@@ -11,8 +11,8 @@
           aria-label="Menu"
         />
 
-        <q-toolbar-title>
-          Ônibus Online
+        <q-toolbar-title  class="iconeCss pg-black text-black">
+          <q-icon name="directions_bus" />
         </q-toolbar-title>
 
         <!--<div>Quasar v{{ $q.version }}</div>-->
@@ -89,6 +89,12 @@
     </q-page-container>
   </q-layout>
 </template>
+<style scoped>
+  .iconeCss {
+    position: relative;
+    left: 125px;
+  }
+</style>
 
 <script>
 export default {
