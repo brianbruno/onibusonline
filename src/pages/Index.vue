@@ -164,11 +164,18 @@ export default {
     },
     plotarParadas: function () {
       const self = this
+      // eslint-disable-next-line no-undef
+      self.LeafIcon = L.Icon.extend({
+        options: {
+          iconSize: [35, 45]
+        }
+      })
+      let busIcon = new self.LeafIcon({ iconUrl: 'https://images.brian.place/bus_icon.png' })
       self.paradas.forEach((coord) => {
         if (!self.objetoParada[coord.x + '#' + coord.y]) {
           self.objetoParada[coord.x + '#' + coord.y] = coord
           // eslint-disable-next-line no-undef
-          L.marker([coord.y, coord.x]).addTo(self.mapa).on('click', function (e) {
+          L.marker([coord.y, coord.x], { icon: busIcon }).addTo(self.mapa).on('click', function (e) {
             self.informacaoParada(e)
           })
         }
